@@ -58,16 +58,11 @@ public class LockingLazy<T> implements Lazy<T> {
 
     @Override
     public void use(Consumer<? super T> consumer) {
-        consumer.accept(ensureValue());
+
     }
 
     @Override
     public <V> V apply(Function<? super T, V> function) {
         return function.apply(ensureValue());
-    }
-
-    @Override
-    public <V> Lazy<V> map(Function<? super T, V> mapper) {
-        return Lazy.unsafe(() -> mapper.apply(get()));
     }
 }

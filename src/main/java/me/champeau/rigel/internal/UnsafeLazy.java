@@ -52,8 +52,4 @@ public class UnsafeLazy<T> implements Lazy<T> {
         return function.apply(ensureValue());
     }
 
-    @Override
-    public <V> Lazy<V> map(Function<? super T, V> mapper) {
-        return new UnsafeLazy<>(() -> mapper.apply(get()));
-    }
 }

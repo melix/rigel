@@ -42,12 +42,14 @@ public interface Lazy<T> {
 
     /**
      * Executes an operation on the lazily computed value
+     *
      * @param consumer the consumer
      */
     void use(Consumer<? super T> consumer);
 
     /**
      * Applies a function to the lazily computed value and returns its value
+     *
      * @param function the value to apply to the lazily computed value
      * @param <V> the return type
      * @return the result of the function, applied on the lazily computed value
@@ -57,11 +59,14 @@ public interface Lazy<T> {
     /**
      * Creates another lazy wrapper which will eventually apply the supplied
      * function to the lazily computed value
+     *
      * @param mapper the mapping function
      * @param <V> the type of the result of the function
      * @return a new lazy wrapper
      */
-    <V> Lazy<V> map(Function<? super T, V> mapper);
+    default <V> Lazy<V> map(Function<? super T, V> mapper) {
+        return Lazy.unsafe(() -> mapper.apply(get()));
+    }
 
     /**
      * Creates an unsafe lazy value provider, which is not thread-safe.
