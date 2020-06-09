@@ -16,6 +16,7 @@
 package me.champeau.rigel;
 
 import me.champeau.rigel.internal.LockingLazy;
+import me.champeau.rigel.internal.SynchronizedLazy;
 import me.champeau.rigel.internal.UnsafeLazy;
 
 import java.util.function.Consumer;
@@ -77,9 +78,17 @@ public interface Lazy<T> {
 
     /**
      * Creates a thread-safe lazy value provider which performs synchronization
-     * and only executes the supplier once.
+     * via a reentrant lock and only executes the supplier once.
      */
     static <T> Lazy<T> locking(Supplier<T> supplier) {
         return new LockingLazy<>(supplier);
+    }
+
+    /**
+     * Creates a thread-safe lazy value provider which performs synchronization
+     * via a simple lock object and only executes the supplier once.
+     */
+    static <T> Lazy<T> synchronizing(Supplier<T> supplier) {
+        return new SynchronizedLazy<>(supplier);
     }
 }

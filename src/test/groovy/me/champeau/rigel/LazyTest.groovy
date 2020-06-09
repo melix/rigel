@@ -87,6 +87,38 @@ class LazyTest extends Specification {
         1 * supplier.get()
     }
 
+    def "synchronized lazy can handle concurrent threads"() {
+        def supplier = Mock(Supplier)
+        def lazy = Lazy.synchronizing(supplier)
+        def executors = Executors.newFixedThreadPool(20)
+
+        when:
+        50.times {
+            executors.submit {
+                lazy.get()
+            }
+        }
+
+        then:
+        1 * supplier.get()
+    }
+
+    def "mapped synchronizing lazy can handle concurrent threads"() {
+        def supplier = Mock(Supplier)
+        def lazy = Lazy.synchronizing(supplier).map { 2 * it }
+        def executors = Executors.newFixedThreadPool(20)
+
+        when:
+        50.times {
+            executors.submit {
+                lazy.get()
+            }
+        }
+
+        then:
+        1 * supplier.get()
+    }
+
     def "can defer initialization using Lazy"() {
         def fibo = new Fibo(24)
 

@@ -32,6 +32,11 @@ public class LazyBenchmark {
 
     @Benchmark
     public int synchronizedLazy() {
+        return Lazy.synchronizing(() -> x + 1).apply(v -> 2 * v);
+    }
+
+    @Benchmark
+    public int lockingLazy() {
         return Lazy.locking(() -> x + 1).apply(v -> 2 * v);
     }
 }
