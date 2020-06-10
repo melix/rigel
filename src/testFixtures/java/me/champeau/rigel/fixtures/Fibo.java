@@ -24,7 +24,7 @@ public class Fibo {
     private final Lazy<Long> value;
 
     public Fibo(long n) {
-        this.value = Lazy.unsafe(() -> fibo(n));
+        this.value = Lazy.unsafe().of(() -> fibo(n));
     }
 
     public String directUse() {

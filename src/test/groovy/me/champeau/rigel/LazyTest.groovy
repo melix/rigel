@@ -5,6 +5,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
 
 class LazyTest extends Specification {
@@ -48,16 +49,42 @@ class LazyTest extends Specification {
         val == 3 * expected
 
         where:
-        factory                                   || expected
-        { s -> Lazy.unsafe(s) }                | 123
-        { s -> Lazy.unsafe(s).map { 2 * it } } | 246
-        { s -> Lazy.locking(s) }                   | 123
-        { s -> Lazy.locking(s).map { 2 * it } }    | 246
+        factory                                || expected
+        { s -> Lazy.unsafe().of(s) }                 | 123
+        { s -> Lazy.unsafe().of(s).map { 2 * it } }  | 246
+        { s -> Lazy.locking().of(s) }                | 123
+        { s -> Lazy.locking().of(s).map { 2 * it } } | 246
     }
 
-    def "locking lazy can handle concurrent threads"() {
+    @Unroll
+    def "lazy can handle concurrent threads (#factoryName)"() {
         def supplier = Mock(Supplier)
-        def lazy = Lazy.locking(supplier)
+        def lazy = factory.of(supplier)
+        def executors = Executors.newFixedThreadPool(20)
+
+        when:
+        50.times {
+            executors.submit {
+                assert lazy.get() == 'hello'
+            }
+        }
+        executors.shutdown()
+        executors.awaitTermination(1, TimeUnit.MINUTES)
+
+        then:
+        1 * supplier.get() >> 'hello'
+
+        where:
+        factoryName     | factory
+        'locking'       | Lazy.locking()
+        'synchronized'  | Lazy.synchronizing()
+        'methodHandle' | Lazy.methodHandle()
+    }
+
+    @Unroll
+    def "locking lazy can handle concurrent threads (#factoryName)"() {
+        def supplier = Mock(Supplier)
+        def lazy = factory.of(supplier).map { 2 * it }
         def executors = Executors.newFixedThreadPool(20)
 
         when:
@@ -66,57 +93,17 @@ class LazyTest extends Specification {
                 lazy.get()
             }
         }
+        executors.shutdown()
+        executors.awaitTermination(1, TimeUnit.MINUTES)
 
         then:
         1 * supplier.get()
-    }
 
-    def "mapped locking lazy can handle concurrent threads"() {
-        def supplier = Mock(Supplier)
-        def lazy = Lazy.locking(supplier).map { 2 * it }
-        def executors = Executors.newFixedThreadPool(20)
-
-        when:
-        50.times {
-            executors.submit {
-                lazy.get()
-            }
-        }
-
-        then:
-        1 * supplier.get()
-    }
-
-    def "synchronized lazy can handle concurrent threads"() {
-        def supplier = Mock(Supplier)
-        def lazy = Lazy.synchronizing(supplier)
-        def executors = Executors.newFixedThreadPool(20)
-
-        when:
-        50.times {
-            executors.submit {
-                lazy.get()
-            }
-        }
-
-        then:
-        1 * supplier.get()
-    }
-
-    def "mapped synchronizing lazy can handle concurrent threads"() {
-        def supplier = Mock(Supplier)
-        def lazy = Lazy.synchronizing(supplier).map { 2 * it }
-        def executors = Executors.newFixedThreadPool(20)
-
-        when:
-        50.times {
-            executors.submit {
-                lazy.get()
-            }
-        }
-
-        then:
-        1 * supplier.get()
+        where:
+        factoryName     | factory
+        'locking'       | Lazy.locking()
+        'synchronized'  | Lazy.synchronizing()
+        'methodHandle' | Lazy.methodHandle()
     }
 
     def "can defer initialization using Lazy"() {

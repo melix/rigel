@@ -16,6 +16,7 @@
 package me.champeau.rigel;
 
 import me.champeau.rigel.internal.LockingLazy;
+import me.champeau.rigel.internal.MethodHandleLazy;
 import me.champeau.rigel.internal.SynchronizedLazy;
 import me.champeau.rigel.internal.UnsafeLazy;
 
@@ -28,8 +29,8 @@ import java.util.function.Supplier;
  * are possible and creating a lazy provider can be done by calling
  * one of the factory methods:
  * <ul>
- *     <li>{@link #unsafe(Supplier)} would create a lazy wrapper which performs no synchronization at all when calling the supplier: it may be called several times concurrently by different threads. Not thread safe!</li>
- *     <li>{@link #unsafe(Supplier)} would create a lazy wrapper which performs locking when calling the supplier: the supplier will only be called once. Reading is done without locking once initialized.</li>
+ *     <li>{@link #unsafe()} would create a lazy wrapper which performs no synchronization at all when calling the supplier: it may be called several times concurrently by different threads. Not thread safe!</li>
+ *     <li>{@link #locking()} would create a lazy wrapper which performs locking when calling the supplier: the supplier will only be called once. Reading is done without locking once initialized.</li>
  * </ul>
  *
  * @param <T> the type of the lazy value
@@ -66,29 +67,27 @@ public interface Lazy<T> {
      * @return a new lazy wrapper
      */
     default <V> Lazy<V> map(Function<? super T, V> mapper) {
-        return Lazy.unsafe(() -> mapper.apply(get()));
+        return unsafe().of(() -> mapper.apply(get()));
     }
 
-    /**
-     * Creates an unsafe lazy value provider, which is not thread-safe.
-     */
-    static <T> Lazy<T> unsafe(Supplier<T> supplier) {
-        return new UnsafeLazy<>(supplier);
+    static Factory unsafe() {
+        return UnsafeLazy::new;
     }
 
-    /**
-     * Creates a thread-safe lazy value provider which performs synchronization
-     * via a reentrant lock and only executes the supplier once.
-     */
-    static <T> Lazy<T> locking(Supplier<T> supplier) {
-        return new LockingLazy<>(supplier);
+    static Factory locking() {
+        return LockingLazy::new;
     }
 
-    /**
-     * Creates a thread-safe lazy value provider which performs synchronization
-     * via a simple lock object and only executes the supplier once.
-     */
-    static <T> Lazy<T> synchronizing(Supplier<T> supplier) {
-        return new SynchronizedLazy<>(supplier);
+    static Factory synchronizing() {
+        return SynchronizedLazy::new;
     }
+
+    static Factory methodHandle() {
+        return MethodHandleLazy::new;
+    }
+
+    interface Factory {
+        <T> Lazy<T> of(Supplier<T> supplier);
+    }
+
 }

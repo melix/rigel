@@ -19,24 +19,43 @@ import me.champeau.rigel.Lazy;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.infra.Blackhole;
 
 @State(Scope.Benchmark)
-public class LazyBenchmark {
+public class LazyReadBenchmark {
 
-    int x = 0;
+    private int x = 0;
+    private final Lazy<Integer> unsafe = Lazy.unsafe().of(this::x);
+    private final Lazy<Integer> locking = Lazy.locking().of(this::x);
+    private final Lazy<Integer> sync = Lazy.synchronizing().of(this::x);
+    private final Lazy<Integer> mh = Lazy.methodHandle().of(this::x);
 
-    @Benchmark
-    public int unsafeLazy() {
-        return Lazy.unsafe(() -> x + 1).apply(v -> 2 * v);
+    int x() {
+        return ++x;
+    }
+
+    static int apply(Lazy<Integer> lazy) {
+        return lazy.apply(v -> 2 * v);
     }
 
     @Benchmark
-    public int synchronizedLazy() {
-        return Lazy.synchronizing(() -> x + 1).apply(v -> 2 * v);
+    public void unsafeLazy(Blackhole blackhole) {
+        blackhole.consume(apply(unsafe));
+    }
+
+
+    @Benchmark
+    public void synchronizedLazy(Blackhole blackhole) {
+        blackhole.consume(apply(sync));
     }
 
     @Benchmark
-    public int lockingLazy() {
-        return Lazy.locking(() -> x + 1).apply(v -> 2 * v);
+    public void lockingLazy(Blackhole blackhole) {
+        blackhole.consume(apply(locking));
+    }
+
+    @Benchmark
+    public void methodHandleLazy(Blackhole blackhole) {
+        blackhole.consume(apply(mh));
     }
 }
