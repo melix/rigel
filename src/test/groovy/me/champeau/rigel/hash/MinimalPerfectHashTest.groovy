@@ -97,6 +97,20 @@ class MinimalPerfectHashTest extends Specification {
 
     }
 
+    void "reasonable error message when can't build hasher"() {
+        def mphbuilder = new MPHBuilder(2, this.&stringHasher)
+        100.times {
+            mphbuilder.add("Hello $it".toString())
+        }
+
+        when:
+        mphbuilder.build()
+
+        then:
+        def e = thrown(IllegalStateException)
+        e.message == "Can't build minimal perfect hash function. Try increasing the number of initial buckets."
+    }
+
     @CompileStatic
     private static int stringHasher(String str, int seed) {
         Random rnd = new Random(seed)

@@ -35,6 +35,7 @@ public class MPHBuilder<T> {
     private final int firstLevelSize;
     private final Bucket<T>[] buckets;
     private final RandomizedHasher<T> hasher;
+    private final int maxFailures = 100_000;
     private int size;
 
     public MPHBuilder(int firstLevelSize, RandomizedHasher<T> hasher) {
@@ -67,6 +68,7 @@ public class MPHBuilder<T> {
         for (Bucket<T> bucket : buckets) {
             int seed = 0;
             int cpt = 0;
+            int failures = 0;
             while (cpt != bucket.size()) {
                 boolean[] cur = new boolean[size];
                 cpt = 0;
@@ -74,6 +76,9 @@ public class MPHBuilder<T> {
                 for (T key : bucket) {
                     int hash = secondLevelHash(key, hasher, size, seed);
                     if (assigned[hash] || cur[hash]) {
+                        if (++failures == maxFailures) {
+                            throw new IllegalStateException("Can't build minimal perfect hash function. Try increasing the number of initial buckets.");
+                        }
                         break;
                     }
                     cur[hash] = true;
