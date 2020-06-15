@@ -20,7 +20,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.function.ToIntFunction;
 
 /**
  * A minimal perfect hash function builder, based on the Hash, Displace and Compress
@@ -91,6 +90,8 @@ public class MPHBuilder<T> {
         for (Bucket<T> bucket : buckets) {
             seeds[bucket.idx] = bucket.seed;
         }
+        // reset bucket order
+        Arrays.sort(buckets, Comparator.comparingInt(Bucket::getIndex));
         return new MPHHash<>(hasher, firstLevelSize, size, seeds);
     }
 
@@ -107,6 +108,10 @@ public class MPHBuilder<T> {
             return entries.add(key);
         }
 
+        public int getIndex() {
+            return idx;
+        }
+
         public int size() {
             return entries.size();
         }
@@ -120,10 +125,6 @@ public class MPHBuilder<T> {
         public String toString() {
             return "Bucket size " + size();
         }
-    }
-
-    public interface MinimalPerfectHasher<T> extends ToIntFunction<T> {
-        int size();
     }
 
     private final static class MPHHash<T> implements MinimalPerfectHasher<T> {

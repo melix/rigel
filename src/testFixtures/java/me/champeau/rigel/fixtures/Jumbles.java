@@ -16,6 +16,7 @@
 package me.champeau.rigel.fixtures;
 
 import me.champeau.rigel.hash.MPHBuilder;
+import me.champeau.rigel.hash.MinimalPerfectHasher;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,10 +27,10 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 public class Jumbles {
-    private final MPHBuilder.MinimalPerfectHasher<String> hashFunction;
+    private final MinimalPerfectHasher<String> hashFunction;
     private final String[] index;
 
-    private Jumbles(MPHBuilder.MinimalPerfectHasher<String> hashFunction, String[] index) {
+    private Jumbles(MinimalPerfectHasher<String> hashFunction, String[] index) {
         this.hashFunction = hashFunction;
         this.index = index;
     }
@@ -42,7 +43,7 @@ public class Jumbles {
         File dic = new File(dictionary);
         MPHBuilder<String> builder = new MPHBuilder<>(50000, Jumbles::hash);
         forEachWord(dic, word -> builder.add(sort(word)));
-        MPHBuilder.MinimalPerfectHasher<String> hashFunction = builder.build();
+        MinimalPerfectHasher<String> hashFunction = builder.build();
         // build the index
         String[] index = new String[hashFunction.size()];
         forEachWord(dic, word -> index[hashFunction.applyAsInt(sort(word))] = word);
