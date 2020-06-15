@@ -78,7 +78,6 @@ class LazyTest extends Specification {
         factoryName     | factory
         'locking'       | Lazy.locking()
         'synchronized'  | Lazy.synchronizing()
-        'methodHandle' | Lazy.methodHandle()
     }
 
     @Unroll
@@ -103,7 +102,6 @@ class LazyTest extends Specification {
         factoryName     | factory
         'locking'       | Lazy.locking()
         'synchronized'  | Lazy.synchronizing()
-        'methodHandle' | Lazy.methodHandle()
     }
 
     def "can defer initialization using Lazy"() {

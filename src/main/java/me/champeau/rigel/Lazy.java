@@ -16,7 +16,6 @@
 package me.champeau.rigel;
 
 import me.champeau.rigel.internal.LockingLazy;
-import me.champeau.rigel.internal.MethodHandleLazy;
 import me.champeau.rigel.internal.SynchronizedLazy;
 import me.champeau.rigel.internal.UnsafeLazy;
 
@@ -80,10 +79,6 @@ public interface Lazy<T> {
 
     static Factory synchronizing() {
         return SynchronizedLazy::new;
-    }
-
-    static Factory methodHandle() {
-        return MethodHandleLazy::new;
     }
 
     interface Factory {

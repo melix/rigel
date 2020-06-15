@@ -28,7 +28,6 @@ public class LazyReadBenchmark {
     private final Lazy<Integer> unsafe = Lazy.unsafe().of(this::x);
     private final Lazy<Integer> locking = Lazy.locking().of(this::x);
     private final Lazy<Integer> sync = Lazy.synchronizing().of(this::x);
-    private final Lazy<Integer> mh = Lazy.methodHandle().of(this::x);
 
     int x() {
         return ++x;
@@ -53,9 +52,5 @@ public class LazyReadBenchmark {
     public void lockingLazy(Blackhole blackhole) {
         blackhole.consume(apply(locking));
     }
-
-    @Benchmark
-    public void methodHandleLazy(Blackhole blackhole) {
-        blackhole.consume(apply(mh));
-    }
+    
 }
