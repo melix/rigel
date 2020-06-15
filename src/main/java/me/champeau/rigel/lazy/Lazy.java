@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.rigel;
+package me.champeau.rigel.lazy;
 
-import me.champeau.rigel.internal.LockingLazy;
-import me.champeau.rigel.internal.SynchronizedLazy;
-import me.champeau.rigel.internal.UnsafeLazy;
+import me.champeau.rigel.lazy.internal.LockingLazy;
+import me.champeau.rigel.lazy.internal.SynchronizedLazy;
+import me.champeau.rigel.lazy.internal.UnsafeLazy;
 
 import java.util.function.Consumer;
 import java.util.function.Function;

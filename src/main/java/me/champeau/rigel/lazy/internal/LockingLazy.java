@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.rigel.internal;
+package me.champeau.rigel.lazy.internal;
 
-import me.champeau.rigel.Lazy;
+import me.champeau.rigel.lazy.Lazy;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;

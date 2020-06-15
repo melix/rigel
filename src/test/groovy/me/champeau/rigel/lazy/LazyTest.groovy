@@ -1,6 +1,7 @@
-package me.champeau.rigel
+package me.champeau.rigel.lazy
 
 import me.champeau.rigel.fixtures.Fibo
+import me.champeau.rigel.lazy.Lazy
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -50,7 +51,7 @@ class LazyTest extends Specification {
 
         where:
         factory                                || expected
-        { s -> Lazy.unsafe().of(s) }                 | 123
+        { s -> Lazy.unsafe().of(s) } | 123
         { s -> Lazy.unsafe().of(s).map { 2 * it } }  | 246
         { s -> Lazy.locking().of(s) }                | 123
         { s -> Lazy.locking().of(s).map { 2 * it } } | 246

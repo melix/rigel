@@ -15,7 +15,7 @@
  */
 package me.champeau.rigel.jmh;
 
-import me.champeau.rigel.Lazy;
+import me.champeau.rigel.lazy.Lazy;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
@@ -52,5 +52,5 @@ public class LazyReadBenchmark {
     public void lockingLazy(Blackhole blackhole) {
         blackhole.consume(apply(locking));
     }
-    
+
 }

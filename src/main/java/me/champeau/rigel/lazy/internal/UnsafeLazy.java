@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.rigel.internal;
+package me.champeau.rigel.lazy.internal;
 
-import me.champeau.rigel.Lazy;
+import me.champeau.rigel.lazy.Lazy;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class SynchronizedLazy<T> implements Lazy<T> {
-    private final Object lock = new Object();
+public class UnsafeLazy<T> implements Lazy<T> {
     private Supplier<T> supplier;
-    private volatile T value;
+    private T value;
 
-    public SynchronizedLazy(Supplier<T> supplier) {
+    public UnsafeLazy(Supplier<T> supplier) {
         this.supplier = supplier;
     }
 
@@ -37,27 +36,20 @@ public class SynchronizedLazy<T> implements Lazy<T> {
 
     private T ensureValue() {
         if (supplier != null) {
-            synchronized (lock) {
-                maybeInitialize();
-            }
+            value = supplier.get();
+            supplier = null;
         }
         return value;
     }
 
-    private void maybeInitialize() {
-        if (supplier != null) {
-            value = supplier.get();
-            supplier = null;
-        }
-    }
-
     @Override
     public void use(Consumer<? super T> consumer) {
-
+        consumer.accept(ensureValue());
     }
 
     @Override
     public <V> V apply(Function<? super T, V> function) {
         return function.apply(ensureValue());
     }
+
 }

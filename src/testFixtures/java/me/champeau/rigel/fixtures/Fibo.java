@@ -15,7 +15,7 @@
  */
 package me.champeau.rigel.fixtures;
 
-import me.champeau.rigel.Lazy;
+import me.champeau.rigel.lazy.Lazy;
 
 /**
  * An example of how to use the lazy initializer.
