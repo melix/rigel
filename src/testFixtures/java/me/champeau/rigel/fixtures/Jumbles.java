@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -48,9 +49,17 @@ public class Jumbles {
         return new Jumbles(hashFunction, index);
     }
 
-    public String guess(String word) {
-        int hash = hashFunction.applyAsInt(sort(word));
-        return index[hash];
+    public Optional<String> guess(String word) {
+        String query = sort(word);
+        int hash = hashFunction.applyAsInt(query);
+        String answer = this.index[hash];
+        // Because we're using a minimal perfect hash, we will
+        // always return a hash within the 0..index size range
+        // so we need to validate that it's a valid answer
+        if (query.equals(sort(answer))) {
+            return Optional.of(answer);
+        }
+        return Optional.empty();
     }
 
     private static int hash(String str, int seed) {

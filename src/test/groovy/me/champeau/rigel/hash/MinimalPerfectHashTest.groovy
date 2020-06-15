@@ -5,6 +5,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.Unroll
+import static java.util.Optional.*
 
 class MinimalPerfectHashTest extends Specification {
     @Subject
@@ -18,9 +19,10 @@ class MinimalPerfectHashTest extends Specification {
 
         where:
         scrambled | expected
-        "ippyz"   | "zippy"
-        "zaaem"   | "amaze"
-        "rwdoc"   | "crowd"
-        "tlufan"  | "flaunt"
+        "ippyz"   | of("zippy")
+        "zaaem"   | of("amaze")
+        "rwdoc"   | of("crowd")
+        "tlufan"  | of("flaunt")
+        "prout"   | empty()
     }
 }
