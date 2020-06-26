@@ -23,6 +23,11 @@ dependencies {
     testImplementation("junit:junit:4.13")
 }
 
+tasks.named<JavaCompile>("compileJava9") {
+    val mainOutput = tasks.named<JavaCompile>("compileJava").flatMap(JavaCompile::getDestinationDirectory)
+    options.compilerArgs.addAll(listOf("--patch-module", "me.champeau.rigel=${mainOutput.get()}"))
+}
+
 publishing {
     repositories {
         maven {
